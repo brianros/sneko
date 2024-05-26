@@ -10,14 +10,14 @@ class Buzzer:
 
     def play_tone(self, frequency, duration):
         self.pwm.freq(frequency)
-        self.pwm.duty_u16(36000)  # 50% duty cycle for volume
+        self.pwm.duty_u16(35000)  # 50% duty cycle for volume
         utime.sleep_ms(duration)
         self.pwm.duty_u16(0)  # turn off the buzzer
 
     def play_direction_sound(self):
         # Define frequency and duration for direction sound
-        frequency = 1200  # Adjust frequency as needed
-        duration = 3  # Adjust duration as needed
+        frequency = 1000  # Adjust frequency as needed
+        duration = 2  # Adjust duration as needed
         self.play_tone(frequency, duration)
 
     def play_pick_sound(self):
@@ -41,4 +41,5 @@ G3 = 196
 A2 = 220
 B2 = 247
 G2 = 98
+
 

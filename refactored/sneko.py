@@ -1,7 +1,9 @@
 from ST7735 import TFT, TFTColor
 from sysfont import sysfont
 from machine import SPI, Pin, ADC
+import utime
 import time
+import math
 import random
 import drawer
 from buzzer import Buzzer  
@@ -287,5 +289,4 @@ def runGame():
         waitWhileJoystick(timeStep)
 
 
-runGame()
 
