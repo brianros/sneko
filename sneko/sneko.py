@@ -72,7 +72,7 @@ def drawWall(XY):
 
 def drawEggplant(XY):
     (x, y) = XY
-    drawer.draw_bmp('/sneko/eggplant.bmp', (8 * x - 4, 8 * y - 4))
+    drawer.draw_bmp('/res/sneko/eggplant.bmp', (8 * x - 4, 8 * y - 4))
 
 def drawLetter(XY, letter):
     drawEmpty(XY)
@@ -158,7 +158,7 @@ def die(nextHead):
         wait(30)
     wait(1000)
     buzzer.play_death_tune() 
-    drawer.draw_bmp('/sneko/deathscreen.bmp', (0, 0))
+    drawer.draw_bmp('/res/sneko/deathscreen.bmp', (0, 0))
 
 def runGame():
     clearAll()
