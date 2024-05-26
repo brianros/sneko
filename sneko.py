@@ -1,4 +1,4 @@
-from ST7735 import TFT
+from ST7735 import TFT, TFTColor
 from sysfont import sysfont
 from machine import SPI, Pin, ADC
 import utime
@@ -6,10 +6,53 @@ import time
 import math
 import random
 import drawer
+
 spi = SPI(1, baudrate=20000000, polarity=0, phase=0, sck=Pin(10), mosi=Pin(11), miso=None)
 tft=TFT(spi,16,17,18)
 tft.initr()
 tft.rgb(True)
+
+class BMPDrawer:
+    def __init__(self, spi, dc, cs, rst):
+        self.tft = TFT(spi, dc, cs, rst)
+        self.tft.initr()
+        self.tft.rgb(True)
+        self.tft.fill(TFT.BLACK)
+    
+    def draw_bmp(self, filename, position):
+        x, y = position
+        f = open(filename, 'rb')
+        if f.read(2) == b'BM':  # header
+            f.read(8)  # file size(4), creator bytes(4)
+            offset = int.from_bytes(f.read(4), 'little')
+            hdrsize = int.from_bytes(f.read(4), 'little')
+            width = int.from_bytes(f.read(4), 'little')
+            height = int.from_bytes(f.read(4), 'little')
+            if int.from_bytes(f.read(2), 'little') == 1:  # planes must be 1
+                depth = int.from_bytes(f.read(2), 'little')
+                if depth == 24 and int.from_bytes(f.read(4), 'little') == 0:  # uncompressed
+                    print("Image size:", width, "x", height)
+                    rowsize = (width * 3 + 3) & ~3
+                    if height < 0:
+                        height = -height
+                        flip = False
+                    else:
+                        flip = True
+                    w, h = width, height
+                    if w > 128: w = 128
+                    if h > 128: h = 128
+                    self.tft._setwindowloc((x, y), (x + w - 1, y + h - 1))
+                    for row in range(h):
+                        if flip:
+                            pos = offset + (height - 1 - row) * rowsize
+                        else:
+                            pos = offset + row * rowsize
+                        if f.tell() != pos:
+                            f.seek(pos)
+                        for col in range(w):
+                            bgr = f.read(3)
+                            self.tft._pushcolor(TFTColor(bgr[2], bgr[1], bgr[0]))
+        f.close()
 
 
 class Joystick:
@@ -47,7 +90,8 @@ class Joystick:
         return x_status, y_status, button_status
 
 
-
+spi = SPI(1, baudrate=20000000, polarity=0, phase=0, sck=Pin(10), mosi=Pin(11), miso=None)
+drawer = BMPDrawer(spi, dc=16, cs=17, rst=18)
 
 joystick = Joystick(pin_x=26, pin_y=27, pin_button=0, deadzone=2000)
 
@@ -57,6 +101,7 @@ sneko = [(6,7), (7,7), (8,7), (9,7)]
 nextLetter = 0
 lastSnakeDir = 4
 snakeDir = 0
+eggplantCoords = (-1, -1)
 
 def updateDir():
     global snakeDir
@@ -108,6 +153,7 @@ def drawLetter(XY, letter):
     tft.text(by8(XY), letter, TFT.WHITE, sysfont, 1)
 
 def writeMap(XY, content):
+    global eggplantCoords
     map[XY[0]][XY[1]] = content
     if content == 0:
         drawLetter(XY, "S")
@@ -120,11 +166,15 @@ def writeMap(XY, content):
     elif content == 4:
         drawWall(XY)
     elif content == 5:
+        eggplantCoords = XY
         drawEggplant(XY)
     elif content == 6:
         drawEmpty(XY)
     elif content == 7:
         drawBlood(XY)
+    
+    if eggplantCoords != (-1, -1):
+        drawEggplant(eggplantCoords)
 
 def rewriteMap(XY):
     print("redraw")
@@ -186,7 +236,7 @@ def die(nextHead):
 def runGame():
     clearAll()
 
-    timeStep = 400
+    timeStep = 150
     timeDecrease = 5
     
     wait(timeStep)
@@ -217,6 +267,7 @@ def runGame():
                 retractTail()
                 advanceHeadOnly(nextHead)
             elif mapNextHead == 5:
+                eggplantCoords = (-1, -1)
                 advanceHeadOnly(nextHead)
                 rewriteMapPeriphery(nextHead)
                 dropEggplant()
