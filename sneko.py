@@ -5,6 +5,7 @@ import utime
 import time
 import math
 import random
+import drawer
 spi = SPI(1, baudrate=20000000, polarity=0, phase=0, sck=Pin(10), mosi=Pin(11), miso=None)
 tft=TFT(spi,16,17,18)
 tft.initr()
@@ -195,6 +196,7 @@ def runGame():
                 dropEggplant()
                 timeStep -= timeDecrease
             else:
+                mapNextHead == sneko[0]
                 fill(sneko.pop(0), 6)
                 fill(nextHead, 7)
                 snakeDir = 0
@@ -204,4 +206,6 @@ def runGame():
 
 
 runGame()
+
+# drawer.draw_bmp('deathscreen.bmp', (0, 0))
 
