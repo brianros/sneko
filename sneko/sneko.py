@@ -1,102 +1,24 @@
 from ST7735 import TFT, TFTColor
 from sysfont import sysfont
 from machine import SPI, Pin, ADC
-import utime
+from drawer import BMPDrawer
+from buzzer import Buzzer  
+from joystick import Joystick
 import time
 import math
 import random
-import drawer
-from buzzer import Buzzer  
+
+
 buzzer = Buzzer(pin_number=1)
 spi = SPI(1, baudrate=20000000, polarity=0, phase=0, sck=Pin(10), mosi=Pin(11), miso=None)
 tft=TFT(spi,16,17,18)
 tft.initr()
 tft.rgb(True)
 
-
-class BMPDrawer:
-    def __init__(self, spi, dc, cs, rst):
-        self.tft = TFT(spi, dc, cs, rst)
-        self.tft.initr()
-        self.tft.rgb(True)
-        self.tft.fill(TFT.BLACK)
-    
-    def draw_bmp(self, filename, position):
-        x, y = position
-        f = open(filename, 'rb')
-        if f.read(2) == b'BM':  # header
-            f.read(8)  # file size(4), creator bytes(4)
-            offset = int.from_bytes(f.read(4), 'little')
-            hdrsize = int.from_bytes(f.read(4), 'little')
-            width = int.from_bytes(f.read(4), 'little')
-            height = int.from_bytes(f.read(4), 'little')
-            if int.from_bytes(f.read(2), 'little') == 1:  # planes must be 1
-                depth = int.from_bytes(f.read(2), 'little')
-                if depth == 24 and int.from_bytes(f.read(4), 'little') == 0:  # uncompressed
-#                     print("Image size:", width, "x", height)
-                    rowsize = (width * 3 + 3) & ~3
-                    if height < 0:
-                        height = -height
-                        flip = False
-                    else:
-                        flip = True
-                    w, h = width, height
-                    if w > 128: w = 128
-                    if h > 128: h = 128
-                    self.tft._setwindowloc((x, y), (x + w - 1, y + h - 1))
-                    for row in range(h):
-                        if flip:
-                            pos = offset + (height - 1 - row) * rowsize
-                        else:
-                            pos = offset + row * rowsize
-                        if f.tell() != pos:
-                            f.seek(pos)
-                        for col in range(w):
-                            bgr = f.read(3)
-                            self.tft._pushcolor(TFTColor(bgr[2], bgr[1], bgr[0]))
-        f.close()
-
-
-class Joystick:
-    def __init__(self, pin_x, pin_y, pin_button, deadzone=2000):
-        self.x_axis = ADC(Pin(pin_x))
-        self.y_axis = ADC(Pin(pin_y))
-        self.button = Pin(pin_button, Pin.IN, Pin.PULL_UP)
-        self.deadzone = deadzone
-
-    def read_x(self):
-        x_value = self.x_axis.read_u16()
-        if x_value < 32768 - self.deadzone:
-            return -(x_value - (32768 - self.deadzone))/(32768 - self.deadzone)
-        elif x_value > 32768 + self.deadzone:
-            return -(x_value - (32768 + self.deadzone))/(32768 - self.deadzone)
-        else:
-            return 0
-
-    def read_y(self):
-        y_value = self.y_axis.read_u16()
-        if y_value < 32768 - self.deadzone:
-            return (y_value - (32768 - self.deadzone))/(32768 - self.deadzone)
-        elif y_value > 32768 + self.deadzone:
-            return (y_value - (32768 + self.deadzone))/(32768 - self.deadzone)
-        else:
-            return 0
-
-    def read_button(self):
-        return 0 if self.button.value() else 1
-
-    def read_joystick(self):
-        x_status = self.read_x()
-        y_status = self.read_y()
-        button_status = self.read_button()
-        return x_status, y_status, button_status
-
-
 spi = SPI(1, baudrate=20000000, polarity=0, phase=0, sck=Pin(10), mosi=Pin(11), miso=None)
 drawer = BMPDrawer(spi, dc=16, cs=17, rst=18)
 
 joystick = Joystick(pin_x=26, pin_y=27, pin_button=0, deadzone=2000)
-
 
 map = [[6 for _ in range(16)] for _ in range(16)]
 sneko = [(6,7), (7,7), (8,7), (9,7)]
@@ -150,7 +72,7 @@ def drawWall(XY):
 
 def drawEggplant(XY):
     (x, y) = XY
-    drawer.draw_bmp('eggplant.bmp', (8 * x - 4, 8 * y - 4))
+    drawer.draw_bmp('/sneko/eggplant.bmp', (8 * x - 4, 8 * y - 4))
 
 def drawLetter(XY, letter):
     drawEmpty(XY)
@@ -236,7 +158,7 @@ def die(nextHead):
         wait(30)
     wait(1000)
     buzzer.play_death_tune() 
-    drawer.draw_bmp('deathscreen.bmp', (0, 0))
+    drawer.draw_bmp('/sneko/deathscreen.bmp', (0, 0))
 
 def runGame():
     clearAll()
@@ -287,6 +209,4 @@ def runGame():
                     die(nextHead)
                     break
         waitWhileJoystick(timeStep)
-
-
 
