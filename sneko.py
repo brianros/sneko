@@ -55,6 +55,7 @@ joystick = Joystick(pin_x=26, pin_y=27, pin_button=0, deadzone=2000)
 map = [[6 for _ in range(16)] for _ in range(16)]
 sneko = [(6,7), (7,7), (8,7), (9,7)]
 nextLetter = 0
+lastSnakeDir = 4
 snakeDir = 0
 
 def updateDir():
@@ -65,7 +66,7 @@ def updateDir():
         newSnakeDir = 4 if x > 0 else 2
     if abs(y) > abs(x):
         newSnakeDir = 1 if y > 0 else 3
-    if (newSnakeDir - snakeDir) % 4 != 2:
+    if (newSnakeDir - lastSnakeDir) % 4 != 2:
         snakeDir = newSnakeDir
 
 def by8(XY):
@@ -73,12 +74,18 @@ def by8(XY):
     return (8 * x, 8 * y)
 
 def wait(t):
-    global snakeDir
+    time.sleep_ms(t)
+
+def waitWhileJoystick(t):
     step = 10
     while t > 0:
-        time.sleep_ms(step)
+        wait(step)
         updateDir()
         t -= step
+
+def readMap(XY):
+    global map
+    return map[XY[0]][XY[1]]
 
 def clearAll():
     tft.fill(TFT.BLACK)
@@ -88,28 +95,19 @@ def drawEmpty(XY):
 
 def drawBlood(XY):
     tft.fillrect(by8(XY), (8, 8), tft.RED)
-    time.sleep_ms(300)
-    (x, y) = XY
-    for i in range(8):
-        radio = i//2 + random.randint(3, 7)
-        posX = 8 * x + 3.5 + random.randint(-5 - i, 5 + i)
-        posY = 8 * y + 3.5 + random.randint(-5 - i, 5 + i)
-        tft.fillcircle((posX, posY), radio, tft.RED)
-        time.sleep_ms(30)
 
 def drawWall(XY):
     tft.fillrect(by8(XY), (8, 8), tft.WHITE)
 
 def drawEggplant(XY):
-    drawEmpty(XY)
     (x, y) = XY
-    tft.fillcircle((8 * x + 3.5, 8 * y + 3.5), 3.5, tft.BLUE)
+    drawer.draw_bmp('eggplant.bmp', (8 * x - 4, 8 * y - 4))
 
 def drawLetter(XY, letter):
     drawEmpty(XY)
     tft.text(by8(XY), letter, TFT.WHITE, sysfont, 1)
 
-def fill(XY, content):
+def writeMap(XY, content):
     map[XY[0]][XY[1]] = content
     if content == 0:
         drawLetter(XY, "S")
@@ -128,15 +126,26 @@ def fill(XY, content):
     elif content == 7:
         drawBlood(XY)
 
+def rewriteMap(XY):
+    print("redraw")
+    writeMap(XY, readMap(XY))
+
+def rewriteMapPeriphery(XY):
+    (x, y) = XY
+    for i in range(max(0, x - 1), 1 + min(15, x + 1)):
+        for j in range(max(0, y - 1), 1 + min(15, y + 1)):
+            rewriteMap((i, j))
+
 def dropEggplant():
     while True:
         x = random.randint(0, 15)
         y = random.randint(0, 15)
         if map[x][y] == 6:
-            fill((x, y), 5)
+            writeMap((x, y), 5)
             break
 
 def moveMod16(head):
+    global lastSnakeDir
     (x, y) = head
     if snakeDir == 1:
         y += 1
@@ -148,34 +157,50 @@ def moveMod16(head):
         x += 1
     x = x % 16
     y = y % 16
+    lastSnakeDir = snakeDir
     return (x,y)
+
+def retractTail():
+    oldTail = sneko.pop(0)
+    writeMap(oldTail, 6)
 
 def advanceHeadOnly(nextHead):
     global nextLetter
     sneko.append(nextHead)
-    fill(nextHead, nextLetter)
+    writeMap(nextHead, nextLetter)
     nextLetter = (nextLetter + 1) % 4
 
-def runGame():
-    global snakeDir
+def die(nextHead):
+    writeMap(nextHead, 7)
+    wait(300)
+    (x, y) = nextHead
+    for i in range(8):
+        radio = i//2 + random.randint(3, 7)
+        posX = 8 * x + 3.5 + random.randint(-5 - i, 5 + i)
+        posY = 8 * y + 3.5 + random.randint(-5 - i, 5 + i)
+        tft.fillcircle((posX, posY), radio, tft.RED)
+        wait(30)
+    wait(1000)
+    drawer.draw_bmp('deathscreen.bmp', (0, 0))
 
+def runGame():
     clearAll()
 
     timeStep = 400
     timeDecrease = 5
     
     wait(timeStep)
-    fill((6,7), 0)
+    writeMap((6,7), 0)
     wait(timeStep)
-    fill((7,7), 1)
+    writeMap((7,7), 1)
     wait(timeStep)
-    fill((8,7), 2)
+    writeMap((8,7), 2)
     wait(timeStep)
-    fill((9,7), 3)
+    writeMap((9,7), 3)
     wait(timeStep)
 
     for i in range(8):
-        fill((4 + i,8), 4)
+        writeMap((4 + i,8), 4)
         wait(100)
 
     wait(timeStep)
@@ -187,25 +212,25 @@ def runGame():
         nextHead = moveMod16(head)
 
         if head != nextHead:
-            mapNextHead = map[nextHead[0]][nextHead[1]]
+            mapNextHead = readMap(nextHead)
             if mapNextHead == 6:
-                fill(sneko.pop(0), 6)
+                retractTail()
                 advanceHeadOnly(nextHead)
             elif mapNextHead == 5:
                 advanceHeadOnly(nextHead)
+                rewriteMapPeriphery(nextHead)
                 dropEggplant()
                 timeStep -= timeDecrease
             else:
-                mapNextHead == sneko[0]
-                fill(sneko.pop(0), 6)
-                fill(nextHead, 7)
-                snakeDir = 0
-                break
-        
-        wait(timeStep)
+                if nextHead == sneko[0]:
+                    retractTail()
+                    advanceHeadOnly(nextHead)
+                else:
+                    retractTail()
+                    die(nextHead)
+                    break
+        waitWhileJoystick(timeStep)
 
 
 runGame()
-
-# drawer.draw_bmp('deathscreen.bmp', (0, 0))
 
