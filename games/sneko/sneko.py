@@ -85,7 +85,7 @@ class Game:
         self.joystickUpdater.cancel()
         self.map.write(nextHead, 7)
         await uasyncio.sleep(0.3)
-        bloodSound = uasyncio.create_task(self.device.buzzer.play_blood_sound(0.03))
+        bloodSound = uasyncio.create_task(self.device.buzzer.play_blood_sound(0.4))
         (x, y) = nextHead
         for i in range(8):
             radio = i//2 + random.randint(3, 7)

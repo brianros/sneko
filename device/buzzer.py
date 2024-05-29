@@ -4,6 +4,9 @@ import utime
 import uasyncio
 
 
+def midiNumber2Frec(m):
+    return 440 * 2 ** ((m - 69)/12)
+
 class Buzzer:
     def __init__(self, pin_number, defaultVolume = 1):
         self.pin = Pin(pin_number)
@@ -34,8 +37,9 @@ class Buzzer:
         uasyncio.create_task(self.play_score(score, silence, volume))
 
     async def play_blood_sound(self, duration):
-        score = [(A2, duration), (B2, duration), (C3, duration), (D3, duration), (E3, duration), (F3, duration), (G3, duration), (A3, duration)]
-        await self.play_score(score, 0)
+        baseNote = 45 # A3
+        for m in range(baseNote, baseNote + 12):
+            await self.play_tone(midiNumber2Frec(m), duration/13)
 
     async def play_death_tune(self):
         score = [(A3, 0.625), (A3, 0.500), (A3, 0.175), (A3, 0.625), (C3, 0.500), (B3, 0.125), (B3, 0.500), (A3, 0.125), (A3, 0.500), (C3, 0.125), (A3, 0.625)]

@@ -1,13 +1,21 @@
-from utils.ST7735 import TFT, TFTColor
+from machine import SPI, Pin
+from ST7735 import TFT, TFTColor
 
 
-class BMPDrawer:
-    def __init__(self, spi, dc, cs, rst):
-        self.tft = TFT(spi, dc, cs, rst)
+class Graphics:
+    def __init__(self, spi):
+        self.spi = SPI(1, baudrate=20000000, polarity=0, phase=0, sck=Pin(10), mosi=Pin(11), miso=None)
+        self.tft = TFT(self.spi, 16, 17, 18)
         self.tft.initr()
         self.tft.rgb(True)
         self.tft.fill(TFT.BLACK)
+
+    def clearScreen():
+        return 0
     
+    def writeText():
+        return 0
+
     def draw_bmp(self, filename, position):
         x, y = position
         f = open(filename, 'rb')
@@ -40,6 +48,6 @@ class BMPDrawer:
                             f.seek(pos)
                         for col in range(w):
                             bgr = f.read(3)
-                            self.tft._pushcolor(TFTColor(bgr[2], bgr[1], bgr[0]))
+                            self.tft._pushcolor(TFTColor(*bgr))
         f.close()
 
