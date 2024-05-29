@@ -28,9 +28,6 @@ class Game:
 
         self.joystickUpdater = uasyncio.create_task(self.updateJoystickCoroutine())
     
-    async def waitStep(self):
-        return uasyncio.sleep(self.timeStep)
-    
     async def updateJoystickCoroutine(self):
         while True:
             await uasyncio.sleep(0.01)
@@ -59,10 +56,30 @@ class Game:
         y = y % 16
         return (x,y)
 
+    def retractTail(self):
+        oldTail = self.snake.pop(0)
+        self.map.write(oldTail, 6)
+
     def advanceHeadOnly(self, nextHead):
         self.snake.append(nextHead)
         self.map.write(nextHead, self.nextLetter)
         self.nextLetter = (self.nextLetter + 1) % 4
+    
+    async def intro(self):
+        self.map.clearAll()
+        await uasyncio.sleep(self.timeStep)
+        for i in range(4):
+            self.device.buzzer.chirp()
+            self.map.write((6 + i, 7), i)
+            await uasyncio.sleep(self.timeStep)
+        for i in range(8):
+            self.device.buzzer.chorp()
+            self.map.write((4 + i,8), 4)
+            await uasyncio.sleep(0.1)
+        await uasyncio.sleep(self.timeStep)
+        self.device.buzzer.chorp()
+        self.map.dropEggplant()
+        await uasyncio.sleep(self.timeStep)
 
     async def death(self, nextHead):
         self.joystickUpdater.cancel()
@@ -82,26 +99,6 @@ class Game:
         self.device.drawer.draw_bmp('/sneko/res/deathscreen.bmp', (0, 0))
         await deathSound
         await uasyncio.sleep(1)
-
-    def retractTail(self):
-        oldTail = self.snake.pop(0)
-        self.map.write(oldTail, 6)
-
-    async def intro(self):
-        self.map.clearAll()
-        await self.waitStep()
-        for i in range(4):
-            self.device.buzzer.chirp()
-            self.map.write((6 + i, 7), i)
-            await self.waitStep()
-        for i in range(8):
-            self.device.buzzer.chorp()
-            self.map.write((4 + i,8), 4)
-            await uasyncio.sleep(0.1)
-        await self.waitStep()
-        self.device.buzzer.chorp()
-        self.map.dropEggplant()
-        await self.waitStep()
 
     async def runGame(self):
         await self.intro()
