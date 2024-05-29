@@ -1,6 +1,7 @@
 # joystick.py
 from machine import ADC, Pin
 
+
 class Joystick:
     def __init__(self, pin_x, pin_y, pin_button, deadzone=2000):
         self.x_axis = ADC(Pin(pin_x))
@@ -27,6 +28,8 @@ class Joystick:
             return 0
 
     def read_button(self):
+        print("Estado actual del boton:")
+        print(self.button.value())
         return 0 if self.button.value() else 1
 
     def read_joystick(self):
@@ -34,3 +37,4 @@ class Joystick:
         y_status = self.read_y()
         button_status = self.read_button()
         return x_status, y_status, button_status
+
