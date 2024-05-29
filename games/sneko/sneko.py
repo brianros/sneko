@@ -11,7 +11,7 @@ import uasyncio
 
 
 
-class Game:
+class Sneko:
     def __init__(self, device):
         self.device = device
         self.map = Map()
