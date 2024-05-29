@@ -7,6 +7,6 @@ from joystick import Joystick
 class Device:
     def __init__(self):
         self.joystick = Joystick(pin_x=26, pin_y=27, pin_button=0, deadzone=2000)
-        self.buzzer = Buzzer(pin_number=1, defaultVolume=0.5)
-        self.graphics = Graphics(self.tft)
+        self.buzzer = Buzzer(pin_number=1)
+        self.graphics = Graphics()
 

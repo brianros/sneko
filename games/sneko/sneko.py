@@ -1,99 +1,43 @@
-from utils.ST7735 import TFT
-from res.sysfont import sysfont
-from machine import SPI, Pin, ADC
-from utils.drawer import BMPDrawer
-from utils.joystick import Joystick
+from device.graphics.ST7735 import TFT
 from map import Map
+from snake import Snake
 import time
 import math
 import random
 import uasyncio
 
 
+time_decrease = 5
+min_time_step = 50
+starting_segments = [(6,7), (7,7), (8,7), (9,7)]
+
 
 class Sneko:
     def __init__(self, device):
         self.device = device
-        self.map = Map()
-
+        self.map = Map(device.graphics)
+        self.snake = Snake(device, self, starting_segments)
         self.score = 0
-
-        self.snake = [(6,7), (7,7), (8,7), (9,7)]
-        self.nextLetter = 0
-        self.snakeDir = 0
-        self.lastSnakeDir = 4
-
-        self.timeStep = 150
-        self.timeDecrease = 5
-
-        self.joystickUpdater = uasyncio.create_task(self.updateJoystickCoroutine())
+        self.time_step = 150
     
-    async def updateJoystickCoroutine(self):
-        while True:
-            await uasyncio.sleep(0.01)
-            x, y, b = self.device.joystick.read_joystick()
-            dir = self.snakeDir
-            if abs(x) > abs(y):
-                dir = 4 if x > 0 else 2
-            if abs(y) > abs(x):
-                dir = 1 if y > 0 else 3
-            if (dir - self.lastSnakeDir) % 4 != 2:
-                self.snakeDir = dir
-                if x !=0 or y !=0:
-                    self.device.buzzer.play_new_direction_sound()
-    
-    def calculateNextHead(self, head):
-        (x, y) = head
-        if self.snakeDir == 1:
-            y += 1
-        elif self.snakeDir == 2:
-            x -= 1
-        elif self.snakeDir == 3:
-            y -= 1
-        elif self.snakeDir == 4:
-            x += 1
-        x = x % 16
-        y = y % 16
-        return (x,y)
-
-    def retractTail(self):
-        oldTail = self.snake.pop(0)
-        self.map.write(oldTail, 6)
-
-    def advanceHeadOnly(self, nextHead):
-        self.snake.append(nextHead)
-        self.map.write(nextHead, self.nextLetter)
-        self.nextLetter = (self.nextLetter + 1) % 4
-    
-    async def intro(self):
+    async def setup(self):
         self.map.clearAll()
-        await uasyncio.sleep(self.timeStep)
+        await uasyncio.sleep(self.time_step)
         for i in range(4):
             self.device.buzzer.chirp()
-            self.map.write((6 + i, 7), i)
-            await uasyncio.sleep(self.timeStep)
+            self.map.write(starting_segments[i], i)
+            await uasyncio.sleep(self.time_step)
         for i in range(8):
             self.device.buzzer.chorp()
             self.map.write((4 + i,8), 4)
             await uasyncio.sleep(0.1)
-        await uasyncio.sleep(self.timeStep)
+        await uasyncio.sleep(self.time_step)
         self.device.buzzer.chorp()
         self.map.dropEggplant()
-        await uasyncio.sleep(self.timeStep)
+        await uasyncio.sleep(self.time_step)
 
     async def death(self, nextHead):
-        self.joystickUpdater.cancel()
-        self.map.write(nextHead, 7)
-        await uasyncio.sleep(0.3)
-        bloodSound = uasyncio.create_task(self.device.buzzer.play_blood_sound(0.4))
-        (x, y) = nextHead
-        for i in range(8):
-            radio = i//2 + random.randint(3, 7)
-            posX = 8 * x + 3.5 + random.randint(-5 - i, 5 + i)
-            posY = 8 * y + 3.5 + random.randint(-5 - i, 5 + i)
-            self.device.tft.fillcircle((posX, posY), radio, TFT.RED)
-            await uasyncio.sleep(0.03)
-        await bloodSound
+        await self.snake.die(nextHead)
         await uasyncio.sleep(1)
         deathSound = uasyncio.create_task(self.device.buzzer.play_death_tune())
         self.device.drawer.draw_bmp('/sneko/res/deathscreen.bmp', (0, 0))
@@ -101,28 +45,25 @@ class Sneko:
         await uasyncio.sleep(1)
 
     async def runGame(self):
-        await self.intro()
+        await self.setup()
         while True:
-            head = self.snake[-1]
-            nextHead = self.calculateNextHead(head)
-            self.lastSnakeDir = self.snakeDir
-            if head != nextHead:
-                mapNextHead = self.map.read(nextHead)
-                if mapNextHead == 6:
-                    self.retractTail()
-                    self.advanceHeadOnly(nextHead)
-                elif mapNextHead == 5:
-                    self.advanceHeadOnly(nextHead)
+            old_head, next_head = self.snake.step()
+            if old_head != next_head:
+                map_next_head = self.map.read(next_head)
+                if map_next_head == 6:
+                    self.snake.retract_tail()
+                    self.snake.advance_head(next_head)
+                elif map_next_head == 5:
+                    self.snake.advance_head(next_head)
                     self.device.buzzer.play_eat_sound()
                     self.map.dropEggplant()
-                    self.timeStep -= self.timeDecrease
+                    self.time_step = max(self.time_step - time_decrease, min_time_step)
                     self.score += 1
                 else:
-                    if nextHead == self.snake[0]:
-                        self.retractTail()
-                        self.advanceHeadOnly(nextHead)
+                    if next_head == self.snake[0]:
+                        self.snake.retract_tail()
+                        self.snake.advance_head(next_head)
                     else:
-                        self.retractTail()
-                        await self.death(nextHead)
+                        await self.death(next_head)
                         break
 

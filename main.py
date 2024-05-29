@@ -1,5 +1,4 @@
 from device.graphics.ST7735 import TFT
-from device.res.sysfont import sysfont
 from games.sneko.sneko import Sneko
 from device.device import Device
 import uasyncio
@@ -17,9 +16,11 @@ async def main():
     while True:
         sneko = Sneko(device)
         await sneko.runGame()
-        device.tft.fill(TFT.BLACK)
-        device.tft.text((60, 64), "Score: " + str(sneko.score), TFT.WHITE, sysfont, 1)
+        device.graphics.clear_screen()
+        device.graphics.write_text((60, 64), "Score: " + str(sneko.score), TFT.WHITE)
+        highscores_music = uasyncio.create_task(device.buzzer.play_highscores_tune())
         await waitForResetButton(device)
+        highscores_music.cancel()
 
 
 uasyncio.run(main())
