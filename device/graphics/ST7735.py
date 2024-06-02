@@ -28,7 +28,7 @@ def clamp( aValue, aMin, aMax ) :
   return max(aMin, min(aMax, aValue))
 
 #@micropython.native
-def TFTColor( aB, aG, aR ) :
+def TFTColor( aR, aG, aB ) :
   '''Create a 16 bit rgb value from the given R,G,B from 0-255.
      This assumes rgb 565 layout and will be incorrect for bgr.'''
   return ((aR & 0xF8) << 8) | ((aG & 0xFC) << 3) | (aB >> 3)
@@ -43,10 +43,10 @@ class TFT(object) :
   RDDID = 0x04
   RDDST = 0x09
 
-  SLPIN  = 0x10
-  SLPOUT  = 0x11
-  PTLON  = 0x12
-  NORON  = 0x13
+  SLPIN = 0x10
+  SLPOUT = 0x11
+  PTLON = 0x12
+  NORON = 0x13
 
   INVOFF = 0x20
   INVON = 0x21
@@ -110,7 +110,7 @@ class TFT(object) :
     self._size = ScreenSize
     self._offset = bytearray([2,1])
     self.rotate = 0                    #Vertical with top toward pins.
-    self._rgb = False                   #color order of rgb.
+    self._rgb = True                   #color order of rgb.
     self.tfa = 0                       #top fixed area
     self.bfa = 0                       #bottom fixed area
     self.dc  = machine.Pin(aDC, machine.Pin.OUT, machine.Pin.PULL_DOWN)
@@ -922,3 +922,4 @@ def makeg(  ) :
   t.initg()
   t.fill(0)
   return t
+

@@ -1,13 +1,28 @@
-from utils.ST7735 import TFT, TFTColor
+from machine import SPI, Pin
+from ST7735 import TFT, TFTColor
+import sysfont
 
 
-class BMPDrawer:
-    def __init__(self, spi, dc, cs, rst):
-        self.tft = TFT(spi, dc, cs, rst)
+class Graphics:
+    def __init__(self):
+        self.spi = SPI(1, baudrate=20000000, polarity=0, phase=0, sck=Pin(10), mosi=Pin(11), miso=None)
+        self.tft = TFT(self.spi, 16, 17, 18)
         self.tft.initr()
         self.tft.rgb(True)
+        self.clear_screen()
+
+    def clear_screen(self):
         self.tft.fill(TFT.BLACK)
     
+    def fill_rect(self, pos, size, color):
+        self.tft.fill_rect(pos, size, color)
+    
+    def fill_circle(self, pos, radius, color):
+        self.device.tft.fillcircle(pos, radius, color)
+
+    def write_text(self, pos, text, color = TFT.WHITE, size = 1, nowrap = False):
+        self.tft.text(pos, text, color, sysfont, size, nowrap)
+
     def draw_bmp(self, filename, position):
         x, y = position
         f = open(filename, 'rb')
@@ -40,6 +55,6 @@ class BMPDrawer:
                             f.seek(pos)
                         for col in range(w):
                             bgr = f.read(3)
-                            self.tft._pushcolor(TFTColor(bgr[2], bgr[1], bgr[0]))
+                            self.tft._pushcolor(TFTColor(*bgr))
         f.close()
 
