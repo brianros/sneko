@@ -1,6 +1,6 @@
 from device.graphics.ST7735 import TFT
-from map import Map
-from snake import Snake
+from games.sneko.map import Map
+from games.sneko.snake import Snake
 import time
 import math
 import random

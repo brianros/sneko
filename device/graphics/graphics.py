@@ -1,6 +1,6 @@
 from machine import SPI, Pin
-from ST7735 import TFT, TFTColor
-import sysfont
+from device.graphics.ST7735 import TFT, TFTColor
+import device.graphics.sysfont
 
 
 class Graphics:
