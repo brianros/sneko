@@ -1,13 +1,12 @@
 import device.graphics.graphics
 from device.graphics.ST7735 import TFT
-from enum import Enum
 import random
 
 
 letters = ['S', 'E', 'K', 'O']
 eggplantPath = '/sneko/res/eggplant.bmp'
 
-class Content(Enum):
+class Content:
     S = 0
     E = 1
     K = 2

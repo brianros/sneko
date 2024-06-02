@@ -5,7 +5,7 @@ import device.graphics.sysfont
 
 class Graphics:
     def __init__(self):
-        self.spi = SPI(1, baudrate=20000000, polarity=0, phase=0, sck=Pin(10), mosi=Pin(11), miso=None)
+        self.spi = SPI(1, baudrate=20000000, polarity=0, phase=0, sck=Pin(14), mosi=Pin(15), miso=None)
         self.tft = TFT(self.spi, 16, 17, 18)
         self.tft.initr()
         self.tft.rgb(True)
