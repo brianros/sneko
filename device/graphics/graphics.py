@@ -1,6 +1,6 @@
 from machine import SPI, Pin
 from device.graphics.ST7735 import TFT, TFTColor
-import device.graphics.sysfont
+from device.graphics.sysfont import sysfont
 
 
 class Graphics:
@@ -15,7 +15,7 @@ class Graphics:
         self.tft.fill(TFT.BLACK)
     
     def fill_rect(self, pos, size, color):
-        self.tft.fill_rect(pos, size, color)
+        self.tft.fillrect(pos, size, color)
     
     def fill_circle(self, pos, radius, color):
         self.device.tft.fillcircle(pos, radius, color)

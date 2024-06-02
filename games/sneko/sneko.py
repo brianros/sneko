@@ -1,6 +1,7 @@
 from device.graphics.ST7735 import TFT
 from games.sneko.map import Map
 from games.sneko.snake import Snake
+from games.sneko.map import Content
 import time
 import math
 import random
@@ -18,7 +19,7 @@ class Sneko:
         self.map = Map(device.graphics)
         self.snake = Snake(device, self, starting_segments)
         self.score = 0
-        self.time_step = 150
+        self.time_step = 0.150
     
     async def setup(self):
         await uasyncio.sleep(self.time_step)
@@ -28,7 +29,7 @@ class Sneko:
             await uasyncio.sleep(self.time_step)
         for i in range(8):
             self.device.buzzer.chorp()
-            self.map.write((4 + i,8), 4)
+            self.map.write((4 + i,8), Content.Wall)
             await uasyncio.sleep(0.1)
         await uasyncio.sleep(self.time_step)
         self.device.buzzer.chorp()
@@ -39,7 +40,7 @@ class Sneko:
         await self.snake.die(nextHead)
         await uasyncio.sleep(1)
         deathSound = uasyncio.create_task(self.device.buzzer.play_death_tune())
-        self.device.drawer.draw_bmp('/sneko/res/deathscreen.bmp', (0, 0))
+        self.device.drawer.draw_bmp('/games/sneko/res/deathscreen.bmp', (0, 0))
         await deathSound
         await uasyncio.sleep(1)
 

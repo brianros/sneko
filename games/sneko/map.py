@@ -4,7 +4,7 @@ import random
 
 
 letters = ['S', 'E', 'K', 'O']
-eggplantPath = '/sneko/res/eggplant.bmp'
+eggplantPath = '/games/sneko/res/eggplant.bmp'
 
 class Content:
     S = 0
@@ -33,19 +33,19 @@ class Map:
         (x, y) = XY
         self.grid[x][y] = content
         if content < 4:
-            self.graphics.draw_letter(by8(XY), letters[content])
+            self.graphics.write_text(by8(XY), letters[content])
         elif content == Content.Eggplant:
             self.graphics.draw_bmp(eggplantPath, by8(XY))
         elif content == Content.Wall:
-            self.graphics.fillrect(by8(XY), (8, 8), TFT.WHITE)
+            self.graphics.fill_rect(by8(XY), (8, 8), TFT.WHITE)
         elif content == Content.Empty:
-            self.graphics.fillrect(by8(XY), (8, 8), TFT.BLACK)
+            self.graphics.fill_rect(by8(XY), (8, 8), TFT.BLACK)
         elif content == Content.Blood:
-            self.graphics.fillrect(by8(XY), (8, 8), TFT.RED)
+            self.graphics.fill_rect(by8(XY), (8, 8), TFT.RED)
 
     def dropEggplant(self):
         while True:
-            XY = random.randint(0, 15, 2)
+            XY = (random.randint(0, 15), random.randint(0, 15))
             if self.read(XY) == Content.Empty:
                 self.write(XY, Content.Eggplant)
                 break
