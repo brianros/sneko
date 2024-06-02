@@ -1,4 +1,3 @@
-# joystick.py
 from machine import ADC, Pin
 
 
