@@ -24,7 +24,8 @@ class Map:
     def __init__(self, graphics):
         self.graphics = graphics
         self.grid = [[Content.Empty for _ in range(16)] for _ in range(16)]
-
+        self.graphics.clear_screen()
+    
     def read(self, XY):
         return self.grid[XY[0]][XY[1]]  
 

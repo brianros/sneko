@@ -21,7 +21,6 @@ class Sneko:
         self.time_step = 150
     
     async def setup(self):
-        self.map.clearAll()
         await uasyncio.sleep(self.time_step)
         for i in range(4):
             self.device.buzzer.chirp()
