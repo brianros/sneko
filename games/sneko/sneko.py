@@ -2,10 +2,7 @@ from device.graphics.ST7735 import TFT
 from games.sneko.map import Map
 from games.sneko.snake import Snake
 from games.sneko.map import MapContent
-import time
-import math
-import random
-import uasyncio
+import uasyncio # type: ignore
 
 
 time_decrease = 5

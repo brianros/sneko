@@ -1,7 +1,7 @@
 from device.graphics.ST7735 import TFT
 from games.sneko.sneko import Sneko
 from device.device import Device
-import uasyncio
+import uasyncio # type: ignore
 
 
 async def waitForResetButton(device):

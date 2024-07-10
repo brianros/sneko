@@ -1,4 +1,4 @@
-from machine import ADC, Pin
+from machine import ADC, Pin # type: ignore
 
 
 class Joystick:

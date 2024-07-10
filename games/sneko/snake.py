@@ -1,6 +1,6 @@
 from device.graphics.ST7735 import TFT
 from games.sneko.map import MapContent
-import uasyncio
+import uasyncio # type: ignore
 import random
 
 
