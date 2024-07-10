@@ -17,21 +17,24 @@ class Sneko:
         self.snake = Snake(device, self, starting_segments)
         self.score = 0
         self.time_step = 0.150
+
+    def step_time_wait(self):
+        return uasyncio.sleep(self.time_step)
     
     async def setup(self):
-        await uasyncio.sleep(self.time_step)
+        await self.step_time_wait()
         for i in range(4):
             self.device.buzzer.chirp()
             self.map.write(starting_segments[i], i)
-            await uasyncio.sleep(self.time_step)
+            await self.step_time_wait()
         for i in range(8):
             self.device.buzzer.chorp()
             self.map.write((4 + i,8), MapContent.WALL)
             await uasyncio.sleep(0.1)
-        await uasyncio.sleep(self.time_step)
+        await self.step_time_wait()
         self.device.buzzer.chorp()
         self.map.drop_eggplant()
-        await uasyncio.sleep(self.time_step)
+        await self.step_time_wait()
 
     async def death(self, nextHead):
         await self.snake.die(nextHead)
@@ -44,6 +47,7 @@ class Sneko:
     async def run_game(self):
         await self.setup()
         while True:
+            await self.step_time_wait()
             head = self.snake.step()
             if head is not None:
                 map_next_head = self.map.read(head)

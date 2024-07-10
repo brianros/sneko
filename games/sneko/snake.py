@@ -56,7 +56,7 @@ class Snake:
 
     def advance_head(self, next_head):
         self.segments.append(next_head)
-        self.map.write(next_head, self.next_letter)
+        self.sneko.map.write(next_head, self.next_letter)
         self.next_letter = (self.next_letter + 1) % 4
 
     async def die(self, next_head):
