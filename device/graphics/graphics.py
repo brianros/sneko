@@ -27,7 +27,7 @@ class Graphics:
     def draw_bmp(self, filename, position):
         uasyncio.create_task(self.draw_bmp_coroutine(filename, position, 10000000, 0))
 
-    async def draw_bmp_coroutine(self, filename, position, chunk_pixels = 100, chunk_pause = 0.01):
+    async def draw_bmp_coroutine(self, filename, position, chunk_pixels = 100, chunk_pause = 0):
         pixel_count = 0
         x, y = position
         f = open(filename, 'rb')
