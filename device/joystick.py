@@ -19,14 +19,11 @@ class Joystick:
     def read_joystick(self):
         x_status = self.read_axis(0)
         y_status = self.read_axis(1)
-        button_status = self.button.value()
+        button_status = not self.button.value()
         return x_status, y_status, button_status
 
     def debug_joystick(self):
-        print("debug_joystick")
-        print(self.axi)
-        print(self.button)
-        print(self.deadzone)
+        print("Joystick data:")
         x, y, b = self.read_joystick()
         print(x)
         print(y)
