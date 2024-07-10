@@ -4,7 +4,7 @@ import uasyncio # type: ignore
 
 
 def midiNumber2Frec(m):
-    return 440 * 2 ** ((m - 69)/12)
+    return math.floor(440 * 2 ** ((m - 69)/12))
 
 class Buzzer:
     def __init__(self, pin_number, defaultVolume = 1):
