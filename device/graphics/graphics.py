@@ -18,7 +18,7 @@ class Graphics:
         self.tft.fillrect(pos, size, color)
     
     def fill_circle(self, pos, radius, color):
-        self.device.tft.fillcircle(pos, radius, color)
+        self.tft.fillcircle(pos, radius, color)
 
     def write_text(self, pos, text, color = TFT.WHITE, size = 1, nowrap = False):
         self.tft.text(pos, text, color, sysfont, size, nowrap)
