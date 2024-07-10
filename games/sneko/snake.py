@@ -36,11 +36,11 @@ class Snake:
         
         (x, y) = oldHead
         if self.next_snake_dir == 1:
-            y += 1
+            y -= 1
         elif self.next_snake_dir == 2:
             x -= 1
         elif self.next_snake_dir == 3:
-            y -= 1
+            y += 1
         elif self.next_snake_dir == 4:
             x += 1
         x = x % 16
