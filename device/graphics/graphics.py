@@ -1,4 +1,5 @@
-from machine import SPI, Pin
+import uasyncio # type: ignore
+from machine import SPI, Pin # type: ignore
 from device.graphics.ST7735 import TFT, TFTColor
 from device.graphics.sysfont import sysfont
 
@@ -24,6 +25,10 @@ class Graphics:
         self.tft.text(pos, text, color, sysfont, size, nowrap)
 
     def draw_bmp(self, filename, position):
+        uasyncio.create_task(self.draw_bmp_coroutine(filename, position, 10000000, 0))
+
+    async def draw_bmp_coroutine(self, filename, position, chunk_pixels = 100, chunk_pause = 0.01):
+        pixel_count = 0
         x, y = position
         f = open(filename, 'rb')
         if f.read(2) == b'BM':  # header
@@ -56,5 +61,9 @@ class Graphics:
                         for col in range(w):
                             bgr = f.read(3)
                             self.tft._pushcolor(TFTColor(*bgr))
+
+                            pixel_count = pixel_count + 1
+                            if pixel_count % chunk_pixels == 0:
+                                await uasyncio.sleep(chunk_pause)
         f.close()
 

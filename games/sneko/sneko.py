@@ -40,7 +40,7 @@ class Sneko:
         await self.snake.die(nextHead)
         await uasyncio.sleep(1)
         deathSound = uasyncio.create_task(self.device.buzzer.play_death_tune())
-        self.device.graphics.draw_bmp('/games/sneko/res/deathscreen.bmp', (0, 0))
+        await self.device.graphics.draw_bmp_coroutine('/games/sneko/res/deathscreen.bmp', (0, 0))
         await deathSound
         await uasyncio.sleep(1)
 
