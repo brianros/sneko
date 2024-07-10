@@ -51,7 +51,7 @@ class Sneko:
             head = self.snake.step()
             if head is not None:
                 map_next_head = self.map.read(head)
-                if map_next_head == MapContent.EMPTY or head == self.snake[0]:
+                if map_next_head == MapContent.EMPTY or head == self.snake.segments[0]:
                     self.snake.retract_tail()
                     self.snake.advance_head(head)
                 elif map_next_head == MapContent.EGGPLANT:
