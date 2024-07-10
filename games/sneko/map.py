@@ -6,15 +6,15 @@ import random
 letters = ['S', 'E', 'K', 'O']
 eggplantPath = '/games/sneko/res/eggplant.bmp'
 
-class Content:
+class MapContent:
     S = 0
     E = 1
     K = 2
     O = 3
-    Eggplant = 4
-    Wall = 5
-    Empty = 6
-    Blood = 7
+    EGGPLANT = 4
+    WALL = 5
+    EMPTY = 6
+    BLOOD = 7
 
 def by8(XY):
     (x, y) = XY
@@ -23,7 +23,7 @@ def by8(XY):
 class Map:
     def __init__(self, graphics):
         self.graphics = graphics
-        self.grid = [[Content.Empty for _ in range(16)] for _ in range(16)]
+        self.grid = [[MapContent.EMPTY for _ in range(16)] for _ in range(16)]
         self.graphics.clear_screen()
     
     def read(self, XY):
@@ -34,19 +34,19 @@ class Map:
         self.grid[x][y] = content
         if content < 4:
             self.graphics.write_text(by8(XY), letters[content])
-        elif content == Content.Eggplant:
+        elif content == MapContent.EGGPLANT:
             self.graphics.draw_bmp(eggplantPath, by8(XY))
-        elif content == Content.Wall:
+        elif content == MapContent.WALL:
             self.graphics.fill_rect(by8(XY), (8, 8), TFT.WHITE)
-        elif content == Content.Empty:
+        elif content == MapContent.EMPTY:
             self.graphics.fill_rect(by8(XY), (8, 8), TFT.BLACK)
-        elif content == Content.Blood:
+        elif content == MapContent.BLOOD:
             self.graphics.fill_rect(by8(XY), (8, 8), TFT.RED)
 
-    def dropEggplant(self):
+    def drop_eggplant(self):
         while True:
             XY = (random.randint(0, 15), random.randint(0, 15))
-            if self.read(XY) == Content.Empty:
-                self.write(XY, Content.Eggplant)
+            if self.read(XY) == MapContent.EMPTY:
+                self.write(XY, MapContent.EGGPLANT)
                 break
 

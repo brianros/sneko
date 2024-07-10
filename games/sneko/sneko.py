@@ -1,7 +1,7 @@
 from device.graphics.ST7735 import TFT
 from games.sneko.map import Map
 from games.sneko.snake import Snake
-from games.sneko.map import Content
+from games.sneko.map import MapContent
 import time
 import math
 import random
@@ -29,11 +29,11 @@ class Sneko:
             await uasyncio.sleep(self.time_step)
         for i in range(8):
             self.device.buzzer.chorp()
-            self.map.write((4 + i,8), Content.Wall)
+            self.map.write((4 + i,8), MapContent.WALL)
             await uasyncio.sleep(0.1)
         await uasyncio.sleep(self.time_step)
         self.device.buzzer.chorp()
-        self.map.dropEggplant()
+        self.map.drop_eggplant()
         await uasyncio.sleep(self.time_step)
 
     async def death(self, nextHead):
@@ -44,26 +44,22 @@ class Sneko:
         await deathSound
         await uasyncio.sleep(1)
 
-    async def runGame(self):
+    async def run_game(self):
         await self.setup()
         while True:
-            old_head, next_head = self.snake.step()
-            if old_head != next_head:
-                map_next_head = self.map.read(next_head)
-                if map_next_head == 6:
+            head = self.snake.step()
+            if head is not None:
+                map_next_head = self.map.read(head)
+                if map_next_head == MapContent.EMPTY or head == self.snake[0]:
                     self.snake.retract_tail()
-                    self.snake.advance_head(next_head)
-                elif map_next_head == 5:
-                    self.snake.advance_head(next_head)
+                    self.snake.advance_head(head)
+                elif map_next_head == MapContent.EGGPLANT:
+                    self.snake.advance_head(head)
                     self.device.buzzer.play_eat_sound()
-                    self.map.dropEggplant()
+                    self.map.drop_eggplant()
                     self.time_step = max(self.time_step - time_decrease, min_time_step)
                     self.score += 1
                 else:
-                    if next_head == self.snake[0]:
-                        self.snake.retract_tail()
-                        self.snake.advance_head(next_head)
-                    else:
-                        await self.death(next_head)
-                        break
+                    await self.death(head)
+                    break
 

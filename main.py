@@ -15,7 +15,7 @@ async def main():
     device = Device()
     while True:
         sneko = Sneko(device)
-        await sneko.runGame()
+        await sneko.run_game()
         device.graphics.clear_screen()
         device.graphics.write_text((60, 64), "Score: " + str(sneko.score), TFT.WHITE)
         highscores_music = uasyncio.create_task(device.buzzer.play_highscores_tune())

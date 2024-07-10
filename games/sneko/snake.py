@@ -1,4 +1,5 @@
 from device.graphics.ST7735 import TFT
+from games.sneko.map import MapContent
 import uasyncio
 import random
 
@@ -9,69 +10,69 @@ class Snake:
         self.sneko = sneko
 
         self.segments = starting_segments
-        self.nextLetter = 0
+        self.next_letter = 0
 
-        self.snakeDir = 0
-        self.lastSnakeDir = 4
+        self.last_snake_dir = 0
+        self.next_snake_dir = 0
         
-        self.joystickUpdater = uasyncio.create_task(self.updateJoystickCoroutine())
+        self.joystick_updater = uasyncio.create_task(self.updateJoystickCoroutine())
     
     async def updateJoystickCoroutine(self):
         while True:
             await uasyncio.sleep(0.01)
             x, y, b = self.device.joystick.read_joystick()
-            dir = self.snakeDir
+            dir = self.next_snake_dir
             if abs(x) > abs(y):
                 dir = 4 if x > 0 else 2
             if abs(y) > abs(x):
                 dir = 1 if y > 0 else 3
-            if (dir - self.lastSnakeDir) % 4 != 2:
-                self.snakeDir = dir
+            if (dir - self.last_snake_dir) % 4 != 2:
+                self.next_snake_dir = dir
                 if x !=0 or y !=0:
                     self.device.buzzer.play_new_direction_sound()
 
     def step(self):
-        old_head = self.segments[-1]
+        oldHead = self.segments[-1]
         
-        (x, y) = old_head
-        if self.snakeDir == 1:
+        (x, y) = oldHead
+        if self.next_snake_dir == 1:
             y += 1
-        elif self.snakeDir == 2:
+        elif self.next_snake_dir == 2:
             x -= 1
-        elif self.snakeDir == 3:
+        elif self.next_snake_dir == 3:
             y -= 1
-        elif self.snakeDir == 4:
+        elif self.next_snake_dir == 4:
             x += 1
         x = x % 16
         y = y % 16
-        next_head = (x,y)
+        new_head = (x,y)
     
-        self.lastSnakeDir = self.snakeDir
-        return (old_head, next_head)
+        self.last_snake_dir = self.next_snake_dir
+        return new_head if oldHead != new_head else None
 
     def retract_tail(self):
         oldTail = self.segments.pop(0)
-        self.sneko.map.write(oldTail, 6)
+        self.sneko.map.write(oldTail, MapContent.EMPTY)
 
     def advance_head(self, next_head):
         self.segments.append(next_head)
-        self.map.write(next_head, self.nextLetter)
-        self.nextLetter = (self.nextLetter + 1) % 4
+        self.map.write(next_head, self.next_letter)
+        self.next_letter = (self.next_letter + 1) % 4
 
-    async def die(self, nextHead):
-        self.joystickUpdater.cancel()
+    async def die(self, next_head):
+        self.joystick_updater.cancel()
         
         self.retract_tail()
-        self.sneko.map.write(nextHead, 7)
+        self.sneko.map.write(next_head, MapContent.BLOOD)
         await uasyncio.sleep(0.3)
 
-        bloodSound = uasyncio.create_task(self.device.buzzer.play_blood_sound(0.4))
-        (x, y) = nextHead
+        blood_sound = uasyncio.create_task(self.device.buzzer.play_blood_sound(0.4))
+        (x, y) = next_head
         for i in range(8):
             radius = i//2 + random.randint(3, 7)
-            posX = 8 * x + 3.5 + random.randint(-5 - i, 5 + i)
-            posY = 8 * y + 3.5 + random.randint(-5 - i, 5 + i)
-            self.device.graphics.fill_circle((posX, posY), radius, TFT.RED)
+            pos_x = 8 * x + 3.5 + random.randint(-5 - i, 5 + i)
+            pos_y = 8 * y + 3.5 + random.randint(-5 - i, 5 + i)
+            self.device.graphics.fill_circle((pos_x, pos_y), radius, TFT.RED)
             await uasyncio.sleep(0.03)
-        await bloodSound
+        await blood_sound
 
