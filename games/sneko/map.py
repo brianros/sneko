@@ -33,6 +33,7 @@ class Map:
         (x, y) = XY
         self.grid[x][y] = content
         if content < 4:
+            self.graphics.fill_rect(by8(XY), (8, 8), TFT.BLACK)
             self.graphics.write_text(by8(XY), letters[content])
         elif content == MapContent.EGGPLANT:
             self.graphics.draw_bmp(eggplantPath, by8(XY))
