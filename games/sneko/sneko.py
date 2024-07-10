@@ -5,8 +5,8 @@ from games.sneko.map import MapContent
 import uasyncio # type: ignore
 
 
-time_decrease = 5
-min_time_step = 50
+time_decrease = 0.005
+min_time_step = 0.050
 starting_segments = [(6,7), (7,7), (8,7), (9,7)]
 
 
