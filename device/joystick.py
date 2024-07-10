@@ -23,6 +23,7 @@ class Joystick:
         return x_status, y_status, button_status
 
     def debug_joystick(self):
+        print("debug_joystick")
         print(self.axi)
         print(self.button)
         print(self.deadzone)
