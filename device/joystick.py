@@ -22,3 +22,12 @@ class Joystick:
         button_status = self.button.value()
         return x_status, y_status, button_status
 
+    def debug_joystick(self):
+        print(self.axi)
+        print(self.button)
+        print(self.deadzone)
+        x, y, b = self.read_joystick()
+        print(x)
+        print(y)
+        print(b)
+
