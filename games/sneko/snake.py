@@ -27,8 +27,8 @@ class Snake:
             if abs(y) > abs(x):
                 dir = 1 if y > 0 else 3
             if (dir - self.last_snake_dir) % 4 != 2:
-                self.next_snake_dir = dir
-                if x !=0 or y !=0:
+                if self.next_snake_dir != dir:
+                    self.next_snake_dir = dir
                     self.device.buzzer.play_new_direction_sound()
 
     def step(self):
