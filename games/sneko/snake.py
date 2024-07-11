@@ -9,7 +9,7 @@ class Snake:
         self.device = device
         self.sneko = sneko
 
-        self.segments = starting_segments
+        self.segments = starting_segments.copy()
         self.next_letter = 0
 
         self.last_snake_dir = 0
