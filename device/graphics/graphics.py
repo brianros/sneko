@@ -9,7 +9,7 @@ class Graphics:
         self.spi = SPI(1, baudrate=20000000, polarity=0, phase=0, sck=Pin(14), mosi=Pin(15), miso=None)
         self.tft = TFT(self.spi, 16, 17, 18)
         self.tft.initr()
-        self.tft.rgb(True)
+        self.tft.rgb(False)
         self.clear_screen()
 
     def clear_screen(self):
@@ -60,7 +60,7 @@ class Graphics:
                             f.seek(pos)
                         for col in range(w):
                             bgr = f.read(3)
-                            self.tft._pushcolor(TFTColor(*bgr))
+                            self.tft._pushcolor(TFTColor(bgr[2], bgr[1], bgr[0]))
 
                             pixel_count = pixel_count + 1
                             if pixel_count % chunk_pixels == 0:
