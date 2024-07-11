@@ -51,6 +51,9 @@ class Buzzer:
 
     def chorp(self):
         uasyncio.create_task(self.play_tone(A1, 0.07))
+    
+    def silence(self):
+        self.pwm.duty_u16(0)
 
 
 # Note durations

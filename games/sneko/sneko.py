@@ -57,6 +57,7 @@ class Sneko:
                 break
         
         highscore_music.cancel()
+        self.device.buzzer.silence()
         self.device.graphics.clear_screen()
         await uasyncio.sleep(0.5)
 
