@@ -8,6 +8,7 @@ fn = 0.4;
 hn = fn/2;
 qn = fn/4;
 en = fn/8;
+sn = fn/16;
 
 # Note frecuencies
 A0  = 28
