@@ -1,6 +1,4 @@
-from device.device import Device
+import device
 
-
-device = Device()
 print("Boot complete")
 

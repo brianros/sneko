@@ -1,15 +1,23 @@
-import uasyncio # type: ignore
-from machine import SPI, Pin # type: ignore
-from device.graphics.ST7735 import TFT, TFTColor
-from device.graphics.sysfont import sysfont
+import uasyncio
+from peripherals.peripheral import Peripheral
+from machine import SPI, Pin
+from peripherals.graphics.ST7735_driver import TFT, TFTColor
+from peripherals.graphics.font import font
 
 
-class Graphics:
-    def __init__(self):
-        self.spi = SPI(1, baudrate=20000000, polarity=0, phase=0, sck=Pin(14), mosi=Pin(15), miso=None)
-        self.tft = TFT(self.spi, 16, 17, 18)
+class ST7735_Controller(Peripheral):
+    def __init__(self, spi_sck, spi_mosi, tft_aDC, tft_aReset, tft_aCS):
+        super().__init__()
+        pin_sck  = Pin(spi_sck)
+        pin_mosi = Pin(spi_mosi)
+        spi = SPI(1, baudrate=20000000, polarity=0, phase=0, sck=pin_sck, mosi=pin_mosi, miso=None)
+        self.tft = TFT(spi, tft_aDC, tft_aReset, tft_aCS)
         self.tft.initr()
         self.tft.rgb(False)
+        self.clear_screen()
+    
+    def reset(self):
+        super().reset()
         self.clear_screen()
 
     def clear_screen(self):
@@ -22,10 +30,10 @@ class Graphics:
         self.tft.fillcircle(pos, radius, color)
 
     def write_text(self, pos, text, color = TFT.WHITE, size = 1, nowrap = False):
-        self.tft.text(pos, text, color, sysfont, size, nowrap)
+        self.tft.text(pos, text, color, font, size, nowrap)
 
     def draw_bmp(self, filename, position):
-        uasyncio.create_task(self.draw_bmp_coroutine(filename, position, 10000000, 0))
+        uasyncio.run(self.draw_bmp_coroutine(filename, position, 1000000000, 0))
 
     async def draw_bmp_coroutine(self, filename, position, chunk_pixels = 100, chunk_pause = 0):
         pixel_count = 0

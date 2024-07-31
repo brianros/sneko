@@ -1,9 +1,9 @@
 import uasyncio
-from games.sneko.sneko import Sneko
-
+import device
+import apps.menu
 
 async def main():
-    await Sneko(device).run_game()
+    await apps.menu.run()
 
 try:
     print("Main loop initiated")
@@ -11,8 +11,10 @@ try:
     uasyncio.run(main_loop)
 except KeyboardInterrupt:
     # Here go debug methods
-    # Here go termination methods
+    # Here go pre-termination methods
     main_loop.close()
+finally:
+    # Here go termination methods
     print("Main loop terminated")
     device.reset()
 

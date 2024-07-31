@@ -1,0 +1,23 @@
+{
+    "python.linting.enabled": true,
+    "python.languageServer": "Pylance",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingModuleSource": "none"
+    },
+    "python.analysis.typeshedPaths": [
+        "~/.micropico-stubs/included"
+    ],
+    "python.analysis.extraPaths": [
+        "~/.micropico-stubs/included"
+    ],
+    "files.exclude": {
+        ".micropico": true,
+        "**/.gitignore": true,
+        "**/.vscode": true,
+        "**/README.md": true,
+        "Pico workspace.code-workspace": true
+    },
+    "micropico.syncFolder": "",
+    "micropico.openOnStart": true
+}

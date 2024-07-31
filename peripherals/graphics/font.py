@@ -1,12 +1,12 @@
+# Font used for ST7735 display, but might be used for others
 
-#Font used for ST7735 display.
+# The font is encoded as a byte array.
+# Each character is 5 pixels wide and 8 high
+# Each byte encodes a column of pixels, being 5 bytes per character
+# Index using 5 * ASCII value.
 
-#Each character uses 5 bytes.
-#index using ASCII value * 5.
-#Each byte contains a column of pixels.
-#The character may be 8 pixels high and 5 wide.
 
-sysfont = {"Width": 5, "Height": 8, "Start": 0, "End": 254, "Data": bytearray([
+font = {"Width": 5, "Height": 8, "Start": 0, "End": 254, "Data": bytearray([
   0x00, 0x00, 0x00, 0x00, 0x00,
   0x3E, 0x5B, 0x4F, 0x5B, 0x3E,
   0x3E, 0x6B, 0x4F, 0x6B, 0x3E,
