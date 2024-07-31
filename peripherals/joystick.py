@@ -1,5 +1,6 @@
 from peripherals.peripheral import Peripheral
 from machine import ADC, Pin
+import uasyncio
 
 
 class Joystick(Peripheral):
@@ -18,6 +19,13 @@ class Joystick(Peripheral):
     def debug(self):
         print(f"Joystick: {self.read()}")
     
+    async def wait_for_button(self):
+        while True:
+            await uasyncio.sleep(0.01)
+            x, y, b = self.read()
+            if (b):
+                break
+
     class Axis:
         def __init__(self, pin, deadzone):
             self.adc = ADC(Pin(pin))

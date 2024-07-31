@@ -33,7 +33,7 @@ class ST7735_Controller(Peripheral):
         self.tft.text(pos, text, color, font, size, nowrap)
 
     def draw_bmp(self, filename, position):
-        uasyncio.run(self.draw_bmp_coroutine(filename, position, 1000000000, 0))
+        uasyncio.create_task(self.draw_bmp_coroutine(filename, position, 1000000000, 0))
 
     async def draw_bmp_coroutine(self, filename, position, chunk_pixels = 100, chunk_pause = 0):
         pixel_count = 0

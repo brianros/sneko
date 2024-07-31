@@ -1,12 +1,18 @@
-from device.graphics.ST7735 import TFT
-from games.sneko.map import MapContent
+import peripherals.graphics.colors as colors
+from apps.sneko.map import MapContent
+import device
+from peripherals.audio.notes import midiNumber2Frec, E3
 import uasyncio # type: ignore
 import random
 
 
+async def play_blood_sound(duration):
+    baseNote = 45 # A3
+    for m in range(baseNote, baseNote + 12):
+        await device.audio.play_tone(midiNumber2Frec(m), duration/13)
+
 class Snake:
-    def __init__(self, device, sneko, starting_segments):
-        self.device = device
+    def __init__(self, sneko, starting_segments):
         self.sneko = sneko
 
         self.segments = starting_segments.copy()
@@ -20,7 +26,7 @@ class Snake:
     async def updateJoystickCoroutine(self):
         while True:
             await uasyncio.sleep(0.01)
-            x, y, b = self.device.joystick.read_joystick()
+            x, y, b = device.joystick.read()
             dir = self.next_snake_dir
             if abs(x) > abs(y):
                 dir = 4 if x > 0 else 2
@@ -29,7 +35,7 @@ class Snake:
             if (dir - self.last_snake_dir) % 4 != 2:
                 if self.next_snake_dir != dir:
                     self.next_snake_dir = dir
-                    self.device.buzzer.play_new_direction_sound()
+                    uasyncio.create_task(device.audio.play_tone(frequency = E3, duration = 0.02, volume = 0.7))
 
     def step(self):
         oldHead = self.segments[-1]
@@ -58,21 +64,24 @@ class Snake:
         self.segments.append(next_head)
         self.sneko.map.write(next_head, self.next_letter)
         self.next_letter = (self.next_letter + 1) % 4
-
+    
     async def die(self, next_head):
-        self.joystick_updater.cancel()
+        self.joystick_updater.cancel() # type: ignore
         
         self.retract_tail()
         self.sneko.map.write(next_head, MapContent.BLOOD)
         await uasyncio.sleep(0.3)
 
-        blood_sound = uasyncio.create_task(self.device.buzzer.play_blood_sound(0.4))
+        blood_sound = uasyncio.create_task(play_blood_sound(0.4))
         (x, y) = next_head
         for i in range(8):
             radius = i//2 + random.randint(3, 7)
             pos_x = 8 * x + 3.5 + random.randint(-5 - i, 5 + i)
             pos_y = 8 * y + 3.5 + random.randint(-5 - i, 5 + i)
-            self.device.graphics.fill_circle((pos_x, pos_y), radius, TFT.RED)
+            device.graphics.fill_circle((pos_x, pos_y), radius, colors.RED)
             await uasyncio.sleep(0.03)
-        await blood_sound
+        await blood_sound # type: ignore
+
+
+
 

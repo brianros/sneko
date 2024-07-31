@@ -1,7 +1,10 @@
-from device.graphics.ST7735 import TFT
-from games.sneko.map import Map
-from games.sneko.snake import Snake
-from games.sneko.map import MapContent
+import device
+import peripherals.graphics.colors as colors
+from apps.sneko.map import Map
+from apps.sneko.snake import Snake
+from apps.sneko.map import MapContent
+from peripherals.audio.notes import *
+from peripherals.audio.music import *
 import uasyncio # type: ignore
 
 
@@ -13,52 +16,43 @@ starting_segments = [(6,7), (7,7), (8,7), (9,7)]
 
 
 class Sneko:
-    def __init__(self, device):
-        self.device = device
-
     async def setup(self):
-        self.map = Map(self.device.graphics)
-        self.snake = Snake(self.device, self, starting_segments)
+        self.map = Map()
+        self.snake = Snake(self, starting_segments)
         self.score = 0
         self.time_step = initial_time_step
 
         await uasyncio.sleep(initial_time_step)
         for i in range(4):
-            self.device.buzzer.chirp()
+            uasyncio.create_task(device.audio.play_tone(A5, 0.1))
             self.map.write(starting_segments[i], i)
             await uasyncio.sleep(initial_time_step)
         for i in range(8):
-            self.device.buzzer.chorp()
+            uasyncio.create_task(device.audio.play_tone(A1, 0.07))
             self.map.write((4 + i,8), MapContent.WALL)
             await uasyncio.sleep(0.1)
         await uasyncio.sleep(initial_time_step)
-        self.device.buzzer.chorp()
+        uasyncio.create_task(device.audio.play_tone(A5, 0.14))
         self.map.drop_eggplant()
         await uasyncio.sleep(initial_time_step)
 
     async def death(self, nextHead):
         await self.snake.die(nextHead)
         await uasyncio.sleep(1)
-        deathSound = uasyncio.create_task(self.device.buzzer.play_death_tune())
-        await self.device.graphics.draw_bmp_coroutine('/games/sneko/res/deathscreen.bmp', (0, 0))
-        await deathSound
+        deathSound = uasyncio.create_task(device.audio.play_score(death_tune, 0.05))
+        await device.graphics.draw_bmp_coroutine('/apps/sneko/res/deathscreen.bmp', (0, 0))
+        await deathSound # type: ignore
 
         await uasyncio.sleep(1)
-        self.device.graphics.clear_screen()
+        device.graphics.clear_screen()
         await uasyncio.sleep(0.5)
         
-        self.device.graphics.write_text((40, 64), "Score: " + str(self.score), TFT.WHITE)
-        highscore_music = uasyncio.create_task(self.device.buzzer.play_highscores_tune())
-
-        while True:
-            await uasyncio.sleep(0.01)
-            x, y, button = self.device.joystick.read_joystick()
-            if (button):
-                break
-        
-        highscore_music.cancel()
-        self.device.buzzer.silence()
-        self.device.graphics.clear_screen()
+        device.graphics.write_text((40, 64), "Score: " + str(self.score), colors.WHITE)
+        highscore_music = uasyncio.create_task(device.audio.play_score(we_are_number_one, 0.01))
+        await device.joystick.wait_for_button()
+        highscore_music.cancel() # type: ignore
+        device.audio.silence()
+        device.graphics.clear_screen()
         await uasyncio.sleep(0.5)
 
     async def run_game(self):
@@ -74,7 +68,8 @@ class Sneko:
                         self.snake.advance_head(head)
                     elif map_next_head == MapContent.EGGPLANT:
                         self.snake.advance_head(head)
-                        self.device.buzzer.play_eat_sound()
+                        eat_score = [(A2, 0.2), (A3, 0.2), (A4, 0.2)]
+                        uasyncio.create_task(device.audio.play_score(eat_score, 0.01, 0.7))
                         self.map.drop_eggplant()
                         self.time_step = max(self.time_step - time_decrease, min_time_step)
                         self.score += 1
