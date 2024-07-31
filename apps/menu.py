@@ -6,7 +6,7 @@ from apps.sneko.sneko import Sneko
 
 
 async def run():
-    device.graphics.write_text((20, 40), "hey there pretty")
+    device.graphics.write_text((16, 32), "hey there pretty")
     await device.audio.play_score(startup_tune, 0.01)
     animation_task = uasyncio.create_task(sleepy_wait_animation())
     await device.joystick.wait_for_button()
