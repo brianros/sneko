@@ -1,15 +1,18 @@
-from device.graphics.ST7735 import TFT
+import uasyncio
 from games.sneko.sneko import Sneko
-from device.device import Device
-import uasyncio # type: ignore
 
 
 async def main():
-    device = Device()
+    await Sneko(device).run_game()
 
-    sneko = Sneko(device)
-    await sneko.run_game()
-
-
-uasyncio.run(main())
+try:
+    print("Main loop initiated")
+    main_loop = main()
+    uasyncio.run(main_loop)
+except KeyboardInterrupt:
+    # Here go debug methods
+    # Here go termination methods
+    main_loop.close()
+    print("Main loop terminated")
+    device.reset()
 
