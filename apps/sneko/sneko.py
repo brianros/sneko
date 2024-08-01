@@ -1,4 +1,5 @@
 import device
+from apps.app import App
 import peripherals.graphics.colors as colors
 from apps.sneko.map import Map
 from apps.sneko.snake import Snake
@@ -15,7 +16,7 @@ min_time_step = 0.050
 starting_segments = [(6,7), (7,7), (8,7), (9,7)]
 
 
-class Sneko:
+class Sneko(App):
     async def setup(self):
         self.map = Map()
         self.snake = Snake(self, starting_segments)
@@ -55,25 +56,26 @@ class Sneko:
         device.graphics.clear_screen()
         await uasyncio.sleep(0.5)
 
-    async def run_game(self):
+    async def run(self):
+        await super().run()
+        
+        await self.setup()
         while True:
-            await self.setup()
-            while True:
-                await uasyncio.sleep(self.time_step)
-                head = self.snake.step()
-                if head is not None:
-                    map_next_head = self.map.read(head)
-                    if map_next_head == MapContent.EMPTY or head == self.snake.segments[0]:
-                        self.snake.retract_tail()
-                        self.snake.advance_head(head)
-                    elif map_next_head == MapContent.EGGPLANT:
-                        self.snake.advance_head(head)
-                        eat_score = [(A2, 0.2), (A3, 0.2), (A4, 0.2)]
-                        uasyncio.create_task(device.audio.play_score(eat_score, 0.01, 0.7))
-                        self.map.drop_eggplant()
-                        self.time_step = max(self.time_step - time_decrease, min_time_step)
-                        self.score += 1
-                    else:
-                        await self.death(head)
-                        break
+            await uasyncio.sleep(self.time_step)
+            head = self.snake.step()
+            if head is not None:
+                map_next_head = self.map.read(head)
+                if map_next_head == MapContent.EMPTY or head == self.snake.segments[0]:
+                    self.snake.retract_tail()
+                    self.snake.advance_head(head)
+                elif map_next_head == MapContent.EGGPLANT:
+                    self.snake.advance_head(head)
+                    eat_score = [(A2, 0.2), (A3, 0.2), (A4, 0.2)]
+                    uasyncio.create_task(device.audio.play_score(eat_score, 0.01, 0.7))
+                    self.map.drop_eggplant()
+                    self.time_step = max(self.time_step - time_decrease, min_time_step)
+                    self.score += 1
+                else:
+                    await self.death(head)
+                    break
 

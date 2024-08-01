@@ -3,7 +3,7 @@ import device
 import apps.menu
 
 async def main():
-    await apps.menu.run()
+    await apps.menu.run_menu()
 
 try:
     print("Main loop initiated")
