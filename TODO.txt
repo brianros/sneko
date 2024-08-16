@@ -1,2 +1,3 @@
 better off alone
 compositor
+minesweeper
