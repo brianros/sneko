@@ -13,11 +13,10 @@
     ],
     "files.exclude": {
         ".micropico": true,
+        "**/__pycache__": true,
         "**/.gitignore": true,
         "**/.vscode": true,
         "**/README.md": true,
         "Pico workspace.code-workspace": true
-    },
-    "micropico.syncFolder": "",
-    "micropico.openOnStart": true
+    }
 }
