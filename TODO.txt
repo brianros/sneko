@@ -2,3 +2,22 @@ better off alone
 compositor
 minesweeper
 moonlander
+
+
+
+crear __init__.py en peripherals, de forma que sea un package, y que ese archivo reemplace a device.py, o como sería?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
