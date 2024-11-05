@@ -6,7 +6,7 @@ moonlander
 
 
 crear __init__.py en peripherals, de forma que sea un package, y que ese archivo reemplace a device.py, o como sería?
-
+o tal vez renombrar peripherals a device, y que ese paquete sea todo
 
 
 
