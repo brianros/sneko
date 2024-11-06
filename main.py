@@ -1,9 +1,9 @@
 import uasyncio
 import device
-import apps.menu
+import apps
 
 async def main():
-    await apps.menu.run()
+    await apps.loader()
 
 try:
     print("Main loop initiated")
