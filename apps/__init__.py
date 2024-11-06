@@ -1,6 +1,6 @@
-import menu
+from .menu import run
 
 
 async def loader():
-    await menu.run()
+    await run()
 
