@@ -5,7 +5,6 @@ from peripherals.joystick import Joystick
 
 
 def reset():
-    print("Resetting device")
     reset_all()
 
 joystick = Joystick(26, 27, 0)
