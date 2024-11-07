@@ -1,25 +1,9 @@
-better off alone
-compositor
-minesweeper
-moonlander
 
+musica:
+	better off alone
 
-
-crear __init__.py en peripherals, de forma que sea un package, y que ese archivo reemplace a device.py, o como sería?
-o tal vez renombrar peripherals a device, y que ese paquete sea todo
-
-o sea, renombrar peripherals a device, importar device como siempre en boot, estar seguro que este accesible esa palabra
-entonces desde todos lados, pero pareceira funcionar, dejar el archivo peripheral.py sin tocar
-
-
-
-
-
-
-
-
-
-
-
-
+apps:
+	compositor
+	minesweeper
+	moonlander
 
