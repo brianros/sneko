@@ -40,19 +40,19 @@ class Sneko:
         await self.snake.die(nextHead)
         await uasyncio.sleep(1)
         deathSound = uasyncio.create_task(device.audio.play_score(death_tune, 0.05))
-        await device.graphics.draw_bmp_coroutine('/apps/sneko/res/deathscreen.bmp', (0, 0))
+        await device.display.draw_bmp_coroutine('/apps/sneko/res/deathscreen.bmp', (0, 0))
         await deathSound # type: ignore
 
         await uasyncio.sleep(1)
-        device.graphics.clear_screen()
+        device.display.clear_screen()
         await uasyncio.sleep(0.5)
         
-        device.graphics.write_text((40, 64), "Score: " + str(self.score), colors.WHITE)
+        device.display.write_text((40, 64), "Score: " + str(self.score), colors.WHITE)
         highscore_music = uasyncio.create_task(device.audio.play_score(we_are_number_one, 0.01))
         await device.joystick.wait_for_button()
         highscore_music.cancel() # type: ignore
         device.audio.silence()
-        device.graphics.clear_screen()
+        device.display.clear_screen()
         await uasyncio.sleep(0.5)
 
     async def run_game(self):

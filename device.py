@@ -9,5 +9,5 @@ def reset():
 
 joystick = Joystick(26, 27, 0)
 audio = Buzzer(1)
-graphics = ST7735_Controller(14, 15, 16, 17, 18)
+display = ST7735_Controller(14, 15, 16, 17, 18)
 
