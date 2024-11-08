@@ -23,7 +23,7 @@ def by8(XY):
 class Map:
     def __init__(self):
         self.grid = [[MapContent.EMPTY for _ in range(16)] for _ in range(16)]
-        device.graphics.clear_screen()
+        device.display.clear_screen()
     
     def read(self, XY):
         return self.grid[XY[0]][XY[1]]  
@@ -32,16 +32,16 @@ class Map:
         (x, y) = XY
         self.grid[x][y] = content
         if content < 4:
-            device.graphics.fill_rect(by8(XY), (8, 8), colors.BLACK)
-            device.graphics.write_text(by8(XY), letters[content])
+            device.display.fill_rect(by8(XY), (8, 8), colors.BLACK)
+            device.display.write_text(by8(XY), letters[content])
         elif content == MapContent.EGGPLANT:
-            device.graphics.draw_bmp(eggplantPath, by8(XY))
+            device.display.draw_bmp(eggplantPath, by8(XY))
         elif content == MapContent.WALL:
-            device.graphics.fill_rect(by8(XY), (8, 8), colors.WHITE)
+            device.display.fill_rect(by8(XY), (8, 8), colors.WHITE)
         elif content == MapContent.EMPTY:
-            device.graphics.fill_rect(by8(XY), (8, 8), colors.BLACK)
+            device.display.fill_rect(by8(XY), (8, 8), colors.BLACK)
         elif content == MapContent.BLOOD:
-            device.graphics.fill_rect(by8(XY), (8, 8), colors.RED)
+            device.display.fill_rect(by8(XY), (8, 8), colors.RED)
 
     def drop_eggplant(self):
         while True:

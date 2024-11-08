@@ -1,0 +1,9 @@
+
+musica:
+	better off alone
+
+apps:
+	compositor
+	minesweeper
+	moonlander
+

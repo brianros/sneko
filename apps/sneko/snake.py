@@ -78,7 +78,7 @@ class Snake:
             radius = i//2 + random.randint(3, 7)
             pos_x = 8 * x + 3.5 + random.randint(-5 - i, 5 + i)
             pos_y = 8 * y + 3.5 + random.randint(-5 - i, 5 + i)
-            device.graphics.fill_circle((pos_x, pos_y), radius, colors.RED)
+            device.display.fill_circle((pos_x, pos_y), radius, colors.RED)
             await uasyncio.sleep(0.03)
         await blood_sound # type: ignore
 
