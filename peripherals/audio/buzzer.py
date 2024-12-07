@@ -1,4 +1,4 @@
-from ..peripheral import Peripheral
+from .. import Peripheral
 import uasyncio
 import math
 from machine import Pin, PWM

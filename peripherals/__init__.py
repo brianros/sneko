@@ -1,1 +1,2 @@
+from .peripheral import Peripheral
 
