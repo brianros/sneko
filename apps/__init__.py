@@ -1,4 +1,4 @@
-from menu import run
+from .menu import run
 
 
 async def loader():
