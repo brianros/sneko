@@ -1,5 +1,5 @@
-import uasyncio
 import device
+import uasyncio
 import apps
 
 async def main():
