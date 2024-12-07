@@ -1,4 +1,4 @@
-from peripheral import Peripheral
+from ..peripheral import Peripheral
 import uasyncio
 from machine import SPI, Pin
 from peripherals.graphics.ST7735_driver import TFT, TFTColor
