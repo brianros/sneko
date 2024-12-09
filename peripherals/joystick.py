@@ -22,10 +22,10 @@ class Joystick(Peripheral):
     
     async def wait_for_button(self):
         while True:
-            await uasyncio.sleep(0.01)
             x, y, b = self.read()
             if (b):
                 break
+            await uasyncio.sleep(0.05)
 
     class Axis:
         def __init__(self, pin, deadzone):
