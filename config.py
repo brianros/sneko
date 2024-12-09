@@ -18,3 +18,9 @@ display = {
 	,	"tft_aCS"			: 18
 }
 
+rotary_encoder = {
+		"pin_x"				: 19
+	,	"pin_y"				: 20
+	,	"clicks_per_turn"	: 20
+}
+
