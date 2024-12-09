@@ -9,17 +9,17 @@ class Peripheral:
         
         _list.append(self)
     
+    def debug(self):
+        raise NotImplementedError(f"Please override peripheral debug for: {type(self).__name__}")
+    
     def reset(self):
         pass
-    
-    def debug(self):
-        print(f"Peripheral debug: {self}")
-
-def reset_peripherals():
-    for p in _list:
-        p.reset()
 
 def debug_peripherals():
     for p in _list:
         p.debug()
+
+def reset_peripherals():
+    for p in _list:
+        p.reset()
 
