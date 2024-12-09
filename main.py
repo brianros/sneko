@@ -11,5 +11,5 @@ try:
 except KeyboardInterrupt:
     main_loop.close()
 finally:
-    device.reset()
+    device.reset_peripherals()
 
