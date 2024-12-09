@@ -1,4 +1,4 @@
-from peripherals.peripheral import reset_all
+from peripherals import reset_all
 from peripherals.graphics.ST7735_controller import ST7735_Controller
 from peripherals.audio.buzzer import Buzzer
 from peripherals.joystick import Joystick
