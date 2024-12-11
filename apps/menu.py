@@ -8,7 +8,7 @@ from apps.frogger.frogger import Frogger
 
 apps = [Sneko, Frogger]
 
-async def run_menu():
+async def run():
 
     selected_app = 0
 
